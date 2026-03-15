@@ -3,6 +3,7 @@ from django.shortcuts import render
 # Create your views here.
 from django.views.generic.list import ListView
 from .models import Task
+from django.urls import path
 
 class HomePageView(ListView):
     model = Task

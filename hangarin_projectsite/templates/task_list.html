@@ -1,67 +1,205 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
-<div class="content">
+<style>
+    /* Blue-outlined cards from your screenshot */
+    .blueprint-card {
+        background: #ffffff;
+        border: 1px solid #bfdbfe; /* Subtle blue outline */
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+    
+    .form-control-sm {
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        height: 38px;
+    }
+
+    /* Modern Table Styling */
+    .table th {
+        border-top: none;
+        font-size: 0.8rem;
+        color: #111827;
+        font-weight: 700;
+        padding-bottom: 15px;
+    }
+    .table td {
+        vertical-align: middle;
+        color: #374151;
+        font-size: 0.9rem;
+        border-bottom: 1px solid #f3f4f6;
+        padding: 12px 8px;
+    }
+
+    /* Pill Badges */
+    .pill {
+        padding: 6px 14px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-block;
+        text-align: center;
+        min-width: 90px;
+    }
+    
+    /* Status Colors */
+    .status-Pending { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+    .status-In-Progress { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .status-Completed { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+
+    /* Priority Colors */
+    .prio-Optional { background: #f3f4f6; color: #4b5563; }
+    .prio-Low { background: #dcfce7; color: #16a34a; }
+    .prio-Medium { background: #f3e8ff; color: #7e22ce; }
+    .prio-High { background: #ffedd5; color: #c2410c; }
+    .prio-Critical { background: #fee2e2; color: #dc2626; }
+
+    /* Category Tag */
+    .cat-tag {
+        background: #14b8a6; /* Teal */
+        color: white;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    /* Icon Action Buttons */
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
+        background: white;
+        text-decoration: none;
+        margin-right: 5px;
+        transition: 0.2s;
+    }
+    .action-btn.edit { color: #3b82f6; border-color: #bfdbfe; }
+    .action-btn.edit:hover { background: #eff6ff; }
+    
+    .action-btn.delete { color: #ef4444; border-color: #fecaca; }
+    .action-btn.delete:hover { background: #fef2f2; }
+</style>
+
+<div class="content pt-4">
     <div class="container-fluid">
-        <h4 class="page-title">Tasks</h4>
         
-        <div class="row mb-3 align-items-center">
-            <div class="col-md-6">
-                <form method="get" action="{% url 'task-list' %}" class="d-flex">
-                    <input type="text" placeholder="Search tasks..." class="form-control mr-2" name="q" value="{{ request.GET.q }}" />
-                    <button type="submit" class="btn btn-info">Search</button>
-                </form>
-            </div>
-            <div class="col-md-4">
-                <form method="get" class="d-flex align-items-center">
-                    <label class="mr-2 mb-0">Sort:</label>
-                    <select class="form-control mr-2" name="sort_by">
-                        <option value="title" {% if request.GET.sort_by == "title" %}selected{% endif %}>Title</option>
-                        <option value="deadline" {% if request.GET.sort_by == "deadline" %}selected{% endif %}>Deadline</option>
-                        <option value="status" {% if request.GET.sort_by == "status" %}selected{% endif %}>Status</option>
-                        <option value="priority" {% if request.GET.sort_by == "priority" %}selected{% endif %}>Priority</option>
+        <div class="blueprint-card">
+            <form method="get" action="{% url 'task-list' %}" class="row align-items-end">
+                <div class="col-md-3">
+                    <label class="font-weight-bold" style="font-size: 0.8rem;">Search <i class="la la-search"></i></label>
+                    <input type="text" name="q" class="form-control form-control-sm" placeholder="Type to search..." value="{{ request.GET.q }}">
+                </div>
+                <div class="col-md-2">
+                    <label class="font-weight-bold" style="font-size: 0.8rem;">Status</label>
+                    <select name="status" class="form-control form-control-sm">
+                        <option value="All">All Status</option>
+                        <option value="Pending" {% if request.GET.status == 'Pending' %}selected{% endif %}>Pending</option>
+                        <option value="In Progress" {% if request.GET.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                        <option value="Completed" {% if request.GET.status == 'Completed' %}selected{% endif %}>Completed</option>
                     </select>
-                    <button type="submit" class="btn btn-secondary">Sort</button>
-                </form>
-            </div>
-            <div class="col-md-2 text-right">
-                <a href="{% url 'task-add' %}" class="btn btn-success">Add Task</a>
-            </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="font-weight-bold" style="font-size: 0.8rem;">Priority</label>
+                    <select name="priority" class="form-control form-control-sm">
+                        <option value="All">All Priorities</option>
+                        {% for p in priorities %}
+                        <option value="{{ p.id }}" {% if request.GET.priority == p.id|stringformat:"s" %}selected{% endif %}>{{ p.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="font-weight-bold" style="font-size: 0.8rem;">Category</label>
+                    <select name="category" class="form-control form-control-sm">
+                        <option value="All">All Categories</option>
+                        {% for c in categories %}
+                        <option value="{{ c.id }}" {% if request.GET.category == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary btn-block" style="background-color: #0d6efd; border-radius: 6px; font-weight: 600;">Filter</button>
+                </div>
+            </form>
         </div>
 
-        <div class="card">
-            <div class="card-body">
-                <table class="table table-striped">
+        <div class="blueprint-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="font-weight-bold m-0 text-dark">All Tasks ({{ total_filtered }})</h5>
+                
+                <form method="get" class="d-flex align-items-center">
+                    {% if request.GET.q %}<input type="hidden" name="q" value="{{ request.GET.q }}">{% endif %}
+                    {% if request.GET.status %}<input type="hidden" name="status" value="{{ request.GET.status }}">{% endif %}
+                    {% if request.GET.priority %}<input type="hidden" name="priority" value="{{ request.GET.priority }}">{% endif %}
+                    {% if request.GET.category %}<input type="hidden" name="category" value="{{ request.GET.category }}">{% endif %}
+                    
+                    <label class="mr-2 mb-0 font-weight-bold text-dark" style="font-size: 0.85rem;">Sort by</label>
+                    <select name="sort_by" class="form-control form-control-sm mr-2" style="width: auto;">
+                        <option value="-created_at" {% if request.GET.sort_by == "-created_at" %}selected{% endif %}>Created Date</option>
+                        <option value="title" {% if request.GET.sort_by == "title" %}selected{% endif %}>Title</option>
+                        <option value="deadline" {% if request.GET.sort_by == "deadline" %}selected{% endif %}>Due Date</option>
+                        <option value="priority" {% if request.GET.sort_by == "priority" %}selected{% endif %}>Priority</option>
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-outline-secondary" style="border-radius: 6px;">Sort</button>
+                </form>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-borderless table-hover">
                     <thead>
                         <tr>
                             <th>Title</th>
-                            <th>Status</th>
-                            <th>Deadline</th>
-                            <th>Priority</th>
-                            <th>Action</th> </tr>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Priority</th>
+                            <th class="text-center">Category</th>
+                            <th>Due Date</th>
+                            <th class="text-center">Action</th>
+                        </tr>
                     </thead>
                     <tbody>
                         {% for task in tasks %}
                         <tr>
-                            <td>{{ task.title }}</td>
-                            <td>{{ task.status }}</td>
-                            <td>{{ task.deadline|date:"M d, Y" }}</td>
-                            <td>{{ task.priority.name }}</td>
-                            <td>
-                                <a href="{% url 'task-update' task.id %}" class="text-primary mr-2">Edit</a>
-                                <a href="{% url 'task-delete' task.id %}" class="text-danger">Delete</a>
+                            <td class="text-dark">{{ task.title }}</td>
+                            <td class="text-center">
+                                <span class="pill status-{{ task.status|slugify|title }}">{{ task.status }}</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="pill prio-{{ task.priority.name|slugify|title }}">{{ task.priority.name }}</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="cat-tag">{{ task.category.name }}</span>
+                            </td>
+                            <td>{{ task.deadline|date:"F d, Y, g:i a" }}</td>
+                            <td class="text-center">
+                                <a href="{% url 'task-update' task.id %}" class="action-btn edit" title="Edit Task">
+                                    <i class="la la-edit"></i>
+                                </a>
+                                <a href="{% url 'task-delete' task.id %}" class="action-btn delete" title="Delete Task">
+                                    <i class="la la-trash"></i>
+                                </a>
                             </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="5" class="text-center">No tasks found.</td>
+                            <td colspan="6" class="text-center py-5 text-muted">No tasks match your filters.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-                
+            </div>
+            
+            <div class="mt-3">
                 {% include 'includes/pagination.html' %}
             </div>
         </div>
+        
     </div>
 </div>
 {% endblock %}

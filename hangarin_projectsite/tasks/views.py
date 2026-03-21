@@ -9,7 +9,9 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.db.models import Q
-from .forms import TaskForm
+from .forms import NoteFormSet, SubTaskFormSet, TaskForm
+from .models import Task, Category, Priority
+from django.db import transaction
 
 class HomePageView(ListView):
     model = Task
@@ -68,15 +70,38 @@ class TaskListView(ListView):
 
     def get_queryset(self):
         qs = super().get_queryset()
+        
+        # 1. Search [cite: 158-160]
         query = self.request.GET.get('q')
         if query:
-            qs = qs.filter(
-                Q(title__icontains=query) | Q(description__icontains=query)
-            )
+            qs = qs.filter(Q(title__icontains=query) | Q(description__icontains=query))
+
+        # 2. Filters
+        status = self.request.GET.get('status')
+        if status and status != 'All':
+            qs = qs.filter(status=status)
+
+        priority = self.request.GET.get('priority')
+        if priority and priority != 'All':
+            qs = qs.filter(priority__id=priority)
+
+        category = self.request.GET.get('category')
+        if category and category != 'All':
+            qs = qs.filter(category__id=category)
+
         return qs
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs) # [cite: 412-413]
+        # Pass data to populate the filter dropdowns
+        context['categories'] = Category.objects.all()
+        context['priorities'] = Priority.objects.all()
+        # Pass the total count for the table header
+        context['total_filtered'] = self.get_queryset().count()
+        return context
+
     def get_ordering(self):
-        allowed_sorts = ["title", "deadline", "status", "priority"]
+        allowed_sorts = ["title", "deadline", "status", "priority"] # [cite: 531-532]
         sort_by = self.request.GET.get("sort_by")
         if sort_by in allowed_sorts:
             return sort_by
@@ -88,11 +113,57 @@ class TaskCreateView(CreateView):
     template_name = 'task_form.html'
     success_url = reverse_lazy('task-list')
 
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        if self.request.POST:
+            data['subtasks'] = SubTaskFormSet(self.request.POST)
+            data['notes'] = NoteFormSet(self.request.POST)
+        else:
+            data['subtasks'] = SubTaskFormSet()
+            data['notes'] = NoteFormSet()
+        return data
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        subtasks = context['subtasks']
+        notes = context['notes']
+        with transaction.atomic(): # Ensures everything saves together cleanly
+            self.object = form.save()
+            if subtasks.is_valid() and notes.is_valid():
+                subtasks.instance = self.object
+                subtasks.save()
+                notes.instance = self.object
+                notes.save()
+        return super().form_valid(form)
+
 class TaskUpdateView(UpdateView):
     model = Task
     form_class = TaskForm
-    template_name = 'task_form.html' # We reuse the same form template for updating!
+    template_name = 'task_form.html'
     success_url = reverse_lazy('task-list')
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        if self.request.POST:
+            data['subtasks'] = SubTaskFormSet(self.request.POST, instance=self.object)
+            data['notes'] = NoteFormSet(self.request.POST, instance=self.object)
+        else:
+            data['subtasks'] = SubTaskFormSet(instance=self.object)
+            data['notes'] = NoteFormSet(instance=self.object)
+        return data
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        subtasks = context['subtasks']
+        notes = context['notes']
+        with transaction.atomic():
+            self.object = form.save()
+            if subtasks.is_valid() and notes.is_valid():
+                subtasks.instance = self.object
+                subtasks.save()
+                notes.instance = self.object
+                notes.save()
+        return super().form_valid(form)
 
 class TaskDeleteView(DeleteView):
     model = Task

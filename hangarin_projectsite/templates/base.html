@@ -3,29 +3,180 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    
-    <title>{% block title %}Hangarin Task Manager{% endblock %}</title> <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}"> <link rel="stylesheet" href="{% static 'css/ready.css' %}"> <link rel="stylesheet" href="{% static 'css/demo.css' %}"> </head>
+
+    <title>{% block title %}Hangarin Task Manager{% endblock %}</title> 
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}"> 
+    <link rel="stylesheet" href="{% static 'css/ready.css' %}"> 
+    <link rel="stylesheet" href="{% static 'css/demo.css' %}">
+    <style>
+        /* 1. Minimalist Light Theme Variables */
+        :root {
+            --bg-color: #f8f9fa; /* Very soft off-white background */
+            --text-main: #2b2b2b;
+            --text-muted: #6c757d;
+            --card-bg: #ffffff;
+            --border-color: #eaedf1;
+            --sidebar-active-bg: #eef2ff; /* Soft blue highlight */
+            --sidebar-active-text: #4f46e5; /* Deep indigo */
+        }
+
+        body {
+            background-color: var(--bg-color) !important;
+            color: var(--text-main) !important;
+            font-family: 'Inter', 'Segoe UI', sans-serif; 
+        }
+
+        .wrapper, .main-panel, .content {
+            background-color: var(--bg-color) !important;
+        }
+
+        /* Clean Top Navbar */
+        .main-header .logo-header, .main-header .navbar-header {
+            background-color: var(--card-bg) !important;
+            border-bottom: 1px solid var(--border-color) !important;
+            box-shadow: none !important;
+        }
+        
+        .main-header .logo {
+            color: var(--text-main) !important;
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+        }
+
+        .navbar-toggler-icon {
+            filter: invert(1); /* Makes the hamburger menu dark */
+        }
+
+        /* Clean Sidebar */
+        .sidebar {
+            background-color: var(--card-bg) !important;
+            border-right: 1px solid var(--border-color);
+            box-shadow: none !important;
+        }
+
+        .sidebar .nav-section {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            margin: 25px 20px 10px 20px;
+        }
+
+        .sidebar .nav-item a {
+            color: var(--text-muted) !important;
+            font-weight: 500;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 4px 15px;
+        }
+
+        .sidebar .nav-item a:hover {
+            background: #f3f4f6;
+            color: var(--text-main) !important;
+        }
+
+        /* Modern Active Menu Item */
+        .sidebar .nav-item.active a {
+            background: var(--sidebar-active-bg) !important;
+            color: var(--sidebar-active-text) !important;
+            font-weight: 600;
+            box-shadow: none;
+        }
+    </style>
+</head>
 <body>
     <div class="wrapper">
-        <div class="sidebar">
-            <ul class="nav">
-                <li class="nav-item">
-                    <a href="{% url 'home' %}">
-                        <i class="la la-dashboard"></i>
-                        <p>Dashboard</p> </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{% url 'task-list' %}">
-                        <i class="la la-table"></i>
-                        <p>My Tasks</p>
-                    </a>
-                </li>
-            </ul>
+        
+        <!-- Header with User Profile Dropdown -->
+        <div class="main-header">
+            <div class="logo-header" style="background-color: var(--sidebar-bg); border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <a href="{% url 'home' %}" class="logo" style="color: rgb(80, 92, 255); font-weight: bold; font-size: 1.2rem; text-decoration: none;">
+                    Hangarin
+                </a>
+                <button class="navbar-toggler sidenav-toggler ml-auto" type="button" data-toggle="collapse" data-target="collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+            
+            <nav class="navbar navbar-header navbar-expand-lg" style="background-color: var(--sidebar-bg); border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <div class="container-fluid">
+                    <ul class="navbar-nav topbar-nav ml-md-auto align-items-center">
+
+                        <li class="nav-item mr-4">
+                            <a href="{% url 'task-add' %}" class="btn btn-primary btn-sm" style="background-color: #3b82f6; border: none; border-radius: 8px; font-weight: 600; padding: 8px 16px;">
+                                + Add Task
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item dropdown">
+                            <a class="dropdown-toggle profile-pic" data-toggle="dropdown" href="#" aria-expanded="false" style="color: white; text-decoration: none;">
+                                <span style="background: #0d6efd; color: white; padding: 6px 12px; border-radius: 50%; margin-right: 8px; font-weight: bold;">{{ request.user.username}}</span>
+                                <span>{{ request.user.username}}</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li>
+                                    <div class="user-box">
+                                        <div class="u-text">
+                                            <h4>{{ request.user.username}}</h4>
+                                        </div>
+                                    </div>
+                                </li>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">Logout</a>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
         </div>
 
-        <div class="main-panel"> {% block content %}
-            {% endblock %} </div>
+        <!-- Sidebar and Main Content Area -->
+        <div class="sidebar">
+            <div class="scrollbar-inner sidebar-wrapper">
+                <ul class="nav">
+                    <div class="nav-section">OVERVIEW</div>
+                    
+                    <li class="nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                        <a href="{% url 'home' %}">
+                            <p>Dashboard</p>
+                        </a>
+                    </li>
+
+                    <div class="nav-section">TASK</div>
+                    
+                    <li class="nav-item {% if request.resolver_match.url_name == 'task-list' %}active{% endif %}">
+                        <a href="{% url 'task-list' %}">
+                            <p>Task List</p>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if request.resolver_match.url_name == 'task-add' %}active{% endif %}">
+                        <a href="{% url 'task-add' %}">
+                            <p>Add Task</p>
+                        </a>
+                    </li>
+
+                    <div class="nav-section">MANAGE</div>
+                    
+                    <li class="nav-item">
+                        <a href="#">
+                            <p>Category</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#">
+                            <p>Priority</p>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="main-panel">
+            {% block content %}
+            {% endblock %}
+        </div>
     </div>
 
-    <script src="{% static 'js/core/jquery.3.2.1.min.js' %}"></script> <script src="{% static 'js/core/bootstrap.min.js' %}"></script> </body>
+    <script src="{% static 'js/core/jquery.3.2.1.min.js' %}"></script> 
+    <script src="{% static 'js/core/bootstrap.min.js' %}"></script>
+    
+    <script src="{% static 'js/ready.min.js' %}"></script>
+</body>
 </html>

@@ -1,3 +1,4 @@
+from django.db import models
 from django.shortcuts import render
 
 # Create your views here.
@@ -6,6 +7,7 @@ from .models import Task
 from django.urls import path
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.db.models import Q
 from .forms import TaskForm
 
@@ -15,11 +17,48 @@ class HomePageView(ListView):
     template_name = "home.html"
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["total_tasks"] = Task.objects.count()
-        context["pending_tasks"] = Task.objects.filter(status="Pending").count()
-        return context
+        context = super().get_context_data(**kwargs) # [cite: 413]
+        
+        # 1. Main Stats
+        total = Task.objects.count()
+        completed = Task.objects.filter(status="Completed").count()
+        in_progress = Task.objects.filter(status="In Progress").count()
+        pending = Task.objects.filter(status="Pending").count()
+        
+        context["total_tasks"] = total
+        context["completed_tasks"] = completed
+        context["in_progress_tasks"] = in_progress
+        context["pending_tasks"] = pending
 
+        # 2. Rates
+        # Safe division to avoid ZeroDivisionError
+        context["completion_rate"] = int((completed / total * 100)) if total > 0 else 0
+        
+        # Delinquency (Tasks past deadline that are not completed)
+        now = timezone.now()
+        delinquent_tasks = Task.objects.filter(deadline__lt=now).exclude(status="Completed").count()
+        delinquent_rate = int((delinquent_tasks / total * 100)) if total > 0 else 0
+        context["delinquency_rate"] = delinquent_rate
+        
+        # Compliancy (Tasks completed on or before deadline)
+        compliant_tasks = Task.objects.filter(status="Completed", updated_at__lte=models.F('deadline')).count()
+        context["compliancy_rate"] = int((compliant_tasks / total * 100)) if total > 0 else 0
+
+        # 3. Task Summary by Priority
+        context["prio_optional"] = Task.objects.filter(priority__name__icontains="Optional").count()
+        context["prio_low"] = Task.objects.filter(priority__name__icontains="Low").count()
+        context["prio_medium"] = Task.objects.filter(priority__name__icontains="Medium").count()
+        context["prio_high"] = Task.objects.filter(priority__name__icontains="High").count()
+        context["prio_critical"] = Task.objects.filter(priority__name__icontains="Critical").count()
+
+        # 4. Task Summary by Category
+        context["cat_work"] = Task.objects.filter(category__name__icontains="Work").count()
+        context["cat_project"] = Task.objects.filter(category__name__icontains="Project").count()
+        context["cat_school"] = Task.objects.filter(category__name__icontains="School").count()
+        context["cat_personal"] = Task.objects.filter(category__name__icontains="Personal").count()
+        context["cat_finance"] = Task.objects.filter(category__name__icontains="Finance").count()
+
+        return context
 
 class TaskListView(ListView):
     model = Task

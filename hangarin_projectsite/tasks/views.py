@@ -12,6 +12,7 @@ from django.db.models import Q
 from .forms import NoteFormSet, SubTaskFormSet, TaskForm
 from .models import Task, Category, Priority
 from django.db import transaction
+from django.db.models import Q, Count
 
 class HomePageView(ListView):
     model = Task
@@ -59,6 +60,11 @@ class HomePageView(ListView):
         context["cat_school"] = Task.objects.filter(category__name__icontains="School").count()
         context["cat_personal"] = Task.objects.filter(category__name__icontains="Personal").count()
         context["cat_finance"] = Task.objects.filter(category__name__icontains="Finance").count()
+
+        query_params = self.request.GET.copy()
+        if 'page' in query_params:
+            del query_params['page'] # Remove the old page number
+        context['query_params'] = query_params.urlencode() # Send the rest to the template
 
         return context
 
@@ -169,3 +175,31 @@ class TaskDeleteView(DeleteView):
     model = Task
     template_name = 'task_del.html'
     success_url = reverse_lazy('task-list')
+
+class CategoryListView(ListView):
+    model = Category
+    context_object_name = 'categories'
+    template_name = 'category_list.html'
+
+    def get_queryset(self):
+        # This counts the tasks related to each category, filtered by status
+        return Category.objects.annotate(
+            total_tasks=Count('task'),
+            pending=Count('task', filter=Q(task__status='Pending')),
+            in_progress=Count('task', filter=Q(task__status='In Progress')),
+            completed=Count('task', filter=Q(task__status='Completed'))
+        ).order_by('-total_tasks') # Sorts by most tasks first
+
+class PriorityListView(ListView):
+    model = Priority
+    context_object_name = 'priorities'
+    template_name = 'priority_list.html'
+
+    def get_queryset(self):
+        # This counts the tasks related to each priority, filtered by status
+        return Priority.objects.annotate(
+            total_tasks=Count('task'),
+            pending=Count('task', filter=Q(task__status='Pending')),
+            in_progress=Count('task', filter=Q(task__status='In Progress')),
+            completed=Count('task', filter=Q(task__status='Completed'))
+        ).order_by('-total_tasks')

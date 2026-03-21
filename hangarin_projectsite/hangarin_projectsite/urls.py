@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from tasks.views import HomePageView, TaskListView, TaskCreateView, TaskUpdateView, TaskDeleteView
+from tasks.views import HomePageView, TaskListView, TaskCreateView, TaskUpdateView, TaskDeleteView, CategoryListView, PriorityListView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,4 +25,6 @@ urlpatterns = [
     path('tasks/add/', TaskCreateView.as_view(), name='task-add'),
     path('tasks/<pk>/', TaskUpdateView.as_view(), name='task-update'),
     path('tasks/<pk>/delete/', TaskDeleteView.as_view(), name='task-delete'),
+    path('categories/', CategoryListView.as_view(), name='category-list'),
+    path('priorities/', PriorityListView.as_view(), name='priority-list'),
 ]

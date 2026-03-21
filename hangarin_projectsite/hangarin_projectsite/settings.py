@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-dds_ew2%4xa)=(rc^#lzoe+gw0_9lfpm9uom%0r1_!v5a7-iz*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['yourusername.pythonanywhere.com', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -117,7 +117,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS = (
-    (BASE_DIR / 'static'),
-)
+STATIC_URL = '/static/'
+
+# Where your current CSS and JS files live
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+# The NEW bucket where Django will collect them for PythonAnywhere
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')

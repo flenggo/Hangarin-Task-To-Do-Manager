@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .blueprint-card {
+        background: #ffffff;
+        border: 1px solid #bfdbfe;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        padding: 25px;
+    }
+    .table th {
+        border-top: none;
+        font-size: 0.85rem;
+        font-weight: 700;
+        padding-bottom: 15px;
+    }
+    .table td {
+        vertical-align: middle;
+        color: #374151;
+        font-size: 0.95rem;
+        border-bottom: 1px solid #f3f4f6;
+        padding: 16px 8px;
+    }
+    /* Dynamic Priority Pill Colors */
+    .prio-badge {
+        color: white;
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+    .prio-optional { background-color: #6b7280; }
+    .prio-low { background-color: #22c55e; }
+    .prio-medium { background-color: #3b82f6; }
+    .prio-high { background-color: #eab308; }
+    .prio-critical { background-color: #ef4444; }
+    .prio-default { background-color: #9ca3af; }
+</style>
+
+<div class="content pt-4">
+    <div class="container-fluid">
+        <div class="blueprint-card">
+            <h4 class="font-weight-bold mb-4" style="color: #111827;">Priorities</h4>
+            
+            <div class="table-responsive">
+                <table class="table table-borderless">
+                    <thead>
+                        <tr>
+                            <th style="color: #111827;">Name</th>
+                            <th style="color: #0ea5e9;">Total Tasks</th>
+                            <th style="color: #f59e0b;">Pending</th>
+                            <th style="color: #3b82f6;">In Progress</th>
+                            <th style="color: #10b981;">Completed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for priority in priorities %}
+                        <tr>
+                            <td>
+                                <span class="prio-badge prio-{{ priority.name|slugify|default:'default' }}">
+                                    {{ priority.name }}
+                                </span>
+                            </td>
+                            <td class="font-weight-bold">{{ priority.total_tasks }}</td>
+                            <td>{{ priority.pending }}</td>
+                            <td>{{ priority.in_progress }}</td>
+                            <td>{{ priority.completed }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-center py-4 text-muted">No priorities found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

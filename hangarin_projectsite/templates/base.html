@@ -105,7 +105,7 @@
                                 + Add Task
                             </a>
                         </li>
-                        
+
                         <li class="nav-item dropdown">
                             <a class="dropdown-toggle profile-pic" data-toggle="dropdown" href="#" aria-expanded="false" style="color: white; text-decoration: none;">
                                 <span style="background: #0d6efd; color: white; padding: 6px 12px; border-radius: 50%; margin-right: 8px; font-weight: bold;">{{ request.user.username}}</span>
@@ -155,13 +155,13 @@
 
                     <div class="nav-section">MANAGE</div>
                     
-                    <li class="nav-item">
-                        <a href="#">
+                    <li class="nav-item {% if request.resolver_match.url_name == 'category-list' %}active{% endif %}">
+                        <a href="{% url 'category-list' %}">
                             <p>Category</p>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="#">
+                    <li class="nav-item {% if request.resolver_match.url_name == 'priority-list' %}active{% endif %}">
+                        <a href="{% url 'priority-list' %}">
                             <p>Priority</p>
                         </a>
                     </li>

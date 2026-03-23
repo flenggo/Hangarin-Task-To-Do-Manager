@@ -6,6 +6,7 @@ from django.views.generic.list import ListView
 from .models import Task
 from django.urls import path
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.db.models import Q
@@ -190,6 +191,24 @@ class CategoryListView(LoginRequiredMixin, ListView):
             in_progress=Count('task', filter=Q(task__status='In Progress')),
             completed=Count('task', filter=Q(task__status='Completed'))
         ).order_by('-total_tasks') # Sorts by most tasks first
+    
+class CategoryCreateView(LoginRequiredMixin, CreateView):
+    model = Category
+    fields = ['name'] # Add whatever fields your Category model has
+    template_name = 'category_form.html' # You'll need to create this simple form template
+    success_url = reverse_lazy('category-list')
+
+class CategoryUpdateView(LoginRequiredMixin, UpdateView):
+    model = Category
+    fields = ['name']
+    template_name = 'category_form.html'
+    success_url = reverse_lazy('category-list')
+
+class CategoryDeleteView(LoginRequiredMixin, DeleteView):
+    model = Category
+    template_name = 'category_confirm_delete.html' # You'll need this confirmation page
+    success_url = reverse_lazy('category-list')
+    
 
 class PriorityListView(LoginRequiredMixin, ListView):
     model = Priority

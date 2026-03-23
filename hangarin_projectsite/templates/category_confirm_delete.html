@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* Notice the border is slightly red to indicate a warning! */
+    .blueprint-card-danger {
+        background: #ffffff;
+        border: 1px solid #fecaca; 
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        padding: 40px;
+        max-width: 450px;
+        margin: 40px auto; 
+        text-align: center;
+    }
+
+    /* Danger Button */
+    .btn-pill-danger {
+        background-color: #ef4444;
+        color: white;
+        border-radius: 50px;
+        padding: 10px 24px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: 0.2s;
+        border: none;
+        width: 100%;
+        margin-top: 10px;
+    }
+    .btn-pill-danger:hover {
+        background-color: #dc2626;
+        color: white;
+    }
+
+    /* Cancel Link */
+    .cancel-link {
+        display: block;
+        margin-top: 20px;
+        color: #6b7280;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    .cancel-link:hover {
+        color: #111827;
+        text-decoration: underline;
+    }
+</style>
+
+<div class="content pt-4">
+    <div class="container-fluid">
+        <div class="blueprint-card-danger">
+            
+            <div class="mb-3" style="color: #ef4444;">
+                <i class="la la-exclamation-triangle" style="font-size: 48px;"></i>
+            </div>
+            
+            <h4 class="font-weight-bold mb-3" style="color: #111827;">Delete Category?</h4>
+            
+            <p class="text-muted mb-4" style="font-size: 0.95rem;">
+                Are you sure you want to permanently delete the category <strong>"{{ object.name }}"</strong>? 
+            </p>
+            
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn-pill-danger">
+                    Yes, Delete Category
+                </button>
+            </form>
+            
+            <a href="{% url 'category-list' %}" class="cancel-link">Cancel and keep it</a>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

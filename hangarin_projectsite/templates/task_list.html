@@ -166,7 +166,11 @@
                     <tbody>
                         {% for task in tasks %}
                         <tr>
-                            <td class="text-dark">{{ task.title }}</td>
+                            <td class="text-dark">
+                                <a href="{% url 'task-update' task.id %}" class="text-decoration-none" style="color: #111827; font-weight: 600;">
+                                    {{ task.title }}
+                                </a>
+                            </td>
                             <td class="text-center">
                                 <span class="pill status-{{ task.status|slugify|title }}">{{ task.status }}</span>
                             </td>

@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .blueprint-card {
+        background: #ffffff;
+        border: 1px solid #bfdbfe;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        padding: 40px;
+        max-width: 450px;
+        margin: 40px auto; /* Centers the card on the page */
+    }
+
+    /* Style the generated form inputs */
+    .blueprint-card input[type="text"] {
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        padding: 10px 12px;
+        width: 100%;
+        margin-bottom: 20px;
+        color: #374151;
+    }
+    
+    .blueprint-card input[type="text"]:focus {
+        outline: none;
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+    }
+
+    .blueprint-card label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #4b5563;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    /* Primary Button */
+    .btn-pill-primary {
+        background-color: #0d6efd;
+        color: white;
+        border-radius: 50px;
+        padding: 10px 24px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: 0.2s;
+        border: none;
+        width: 100%;
+        margin-top: 10px;
+    }
+    .btn-pill-primary:hover {
+        background-color: #0b5ed7;
+        color: white;
+    }
+
+    /* Cancel Link */
+    .cancel-link {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+        color: #6b7280;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    .cancel-link:hover {
+        color: #111827;
+        text-decoration: underline;
+    }
+</style>
+
+<div class="content pt-4">
+    <div class="container-fluid">
+        <div class="blueprint-card">
+            
+            <h4 class="font-weight-bold mb-4 text-center" style="color: #111827;">
+                {% if object %}
+                    Edit Category
+                {% else %}
+                    Add New Category
+                {% endif %}
+            </h4>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                {{ form.as_p }}
+                
+                <button type="submit" class="btn-pill-primary">
+                    {% if object %}
+                        Save Changes
+                    {% else %}
+                        Create Category
+                    {% endif %}
+                </button>
+            </form>
+            
+            <a href="{% url 'category-list' %}" class="cancel-link">Nevermind, take me back</a>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

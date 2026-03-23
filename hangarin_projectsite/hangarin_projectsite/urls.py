@@ -16,16 +16,29 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from tasks.views import HomePageView, TaskListView, TaskCreateView, TaskUpdateView, TaskDeleteView, CategoryListView, PriorityListView
+from tasks.views import (
+    HomePageView, TaskListView, TaskCreateView, TaskUpdateView, TaskDeleteView, 
+    CategoryListView, CategoryCreateView, CategoryUpdateView, CategoryDeleteView, # <-- Added these three!
+    PriorityListView
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', HomePageView.as_view(), name='home'),
     path('accounts/', include('allauth.urls')),
+    
+    # Task URLs
     path('tasks/', TaskListView.as_view(), name='task-list'),
     path('tasks/add/', TaskCreateView.as_view(), name='task-add'),
     path('tasks/<pk>/', TaskUpdateView.as_view(), name='task-update'),
     path('tasks/<pk>/delete/', TaskDeleteView.as_view(), name='task-delete'),
+    
+    # Category URLs
     path('categories/', CategoryListView.as_view(), name='category-list'),
+    path('categories/add/', CategoryCreateView.as_view(), name='category-add'), # <-- New!
+    path('categories/<pk>/', CategoryUpdateView.as_view(), name='category-update'), # <-- New!
+    path('categories/<pk>/delete/', CategoryDeleteView.as_view(), name='category-delete'), # <-- New!
+    
+    # Priority URLs
     path('priorities/', PriorityListView.as_view(), name='priority-list'),
 ]

@@ -17,11 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from tasks.views import (
-    HomePageView, TaskListView, TaskCreateView, TaskUpdateView, TaskDeleteView, 
-    CategoryListView, CategoryCreateView, CategoryUpdateView, CategoryDeleteView, # <-- Added these three!
-    PriorityListView
+    HomePageView, TaskListView, TaskCreateView, TaskUpdateView, TaskDeleteView,
+    CategoryListView, CategoryCreateView, CategoryUpdateView, CategoryDeleteView,
+    PriorityListView, PriorityCreateView, PriorityUpdateView, PriorityDeleteView # <-- Add these three!
 )
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', HomePageView.as_view(), name='home'),
@@ -41,4 +40,8 @@ urlpatterns = [
     
     # Priority URLs
     path('priorities/', PriorityListView.as_view(), name='priority-list'),
+    path('priorities/add/', PriorityCreateView.as_view(), name='priority-add'),
+    path('priorities/<pk>/', PriorityUpdateView.as_view(), name='priority-update'),
+    path('priorities/<pk>/delete/', PriorityDeleteView.as_view(), name='priority-delete'),
+
 ]

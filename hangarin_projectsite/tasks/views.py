@@ -208,7 +208,7 @@ class CategoryDeleteView(LoginRequiredMixin, DeleteView):
     model = Category
     template_name = 'category_confirm_delete.html' # You'll need this confirmation page
     success_url = reverse_lazy('category-list')
-    
+
 
 class PriorityListView(LoginRequiredMixin, ListView):
     model = Priority
@@ -223,3 +223,20 @@ class PriorityListView(LoginRequiredMixin, ListView):
             in_progress=Count('task', filter=Q(task__status='In Progress')),
             completed=Count('task', filter=Q(task__status='Completed'))
         ).order_by('-total_tasks')
+    
+class PriorityCreateView(LoginRequiredMixin, CreateView):
+    model = Priority
+    fields = ['name'] # Add other fields if your Priority model has them (like a color or level)
+    template_name = 'priority_form.html'
+    success_url = reverse_lazy('priority-list')
+
+class PriorityUpdateView(LoginRequiredMixin, UpdateView):
+    model = Priority
+    fields = ['name']
+    template_name = 'priority_form.html'
+    success_url = reverse_lazy('priority-list')
+
+class PriorityDeleteView(LoginRequiredMixin, DeleteView):
+    model = Priority
+    template_name = 'priority_confirm_delete.html'
+    success_url = reverse_lazy('priority-list')

@@ -1,73 +1,70 @@
 {% extends 'base.html' %}
+
 {% block content %}
 <style>
-    .blueprint-card {
-        background: #ffffff;
-        border: 1px solid #bfdbfe;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-        padding: 25px;
-    }
-    .table th {
-        border-top: none;
-        font-size: 0.85rem;
-        font-weight: 700;
-        padding-bottom: 15px;
-    }
-    .table td {
-        vertical-align: middle;
-        color: #374151;
-        font-size: 0.95rem;
-        border-bottom: 1px solid #f3f4f6;
-        padding: 16px 8px;
-    }
-    /* Dynamic Priority Pill Colors */
-    .prio-badge {
-        color: white;
-        padding: 5px 12px;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        font-weight: 700;
-    }
-    .prio-optional { background-color: #6b7280; }
-    .prio-low { background-color: #22c55e; }
-    .prio-medium { background-color: #3b82f6; }
-    .prio-high { background-color: #eab308; }
-    .prio-critical { background-color: #ef4444; }
-    .prio-default { background-color: #9ca3af; }
+    .blueprint-card { background: #ffffff; border: 1px solid #bfdbfe; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); padding: 30px; margin-bottom: 24px; }
+    .search-pill-wrapper { background-color: #f3f4f6; border-radius: 50px; padding: 5px 15px; display: flex; align-items: center; width: 100%; max-width: 400px; }
+    .search-pill-wrapper input { border: none; background: transparent; box-shadow: none; width: 100%; padding: 6px 10px; color: #374151; }
+    .search-pill-wrapper input:focus { outline: none; }
+    .btn-pill-primary { background-color: #0d6efd; color: white; border-radius: 50px; padding: 8px 24px; font-weight: 600; text-decoration: none; transition: 0.2s; border: none; }
+    .btn-pill-primary:hover { background-color: #0b5ed7; color: white; }
+    
+    .action-pill { padding: 4px 16px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; text-decoration: none; color: white; display: inline-block; margin-right: 5px; transition: 0.2s; }
+    .action-pill.edit { background-color: #6b7280; } .action-pill.edit:hover { background-color: #4b5563; color: white; }
+    .action-pill.delete { background-color: #ef4444; } .action-pill.delete:hover { background-color: #dc2626; color: white; }
+
+    .table-custom { margin-top: 20px; }
+    .table-custom thead th { background-color: #f8f9fa; color: #4b5563; font-weight: 700; font-size: 0.8rem; border-bottom: 2px solid #e5e7eb; padding: 12px 15px; text-transform: uppercase; }
+    .table-custom tbody tr { border-bottom: 1px solid #f3f4f6; }
+    .table-custom tbody td { padding: 15px; vertical-align: middle; color: #111827; font-weight: 500; font-size: 0.95rem; }
+    .table-custom tbody tr:nth-child(even) td { background-color: #f9fafb; }
+
+    /* Priority Pill Styling */
+    .pill { padding: 6px 14px; border-radius: 50px; font-size: 0.8rem; font-weight: 600; text-align: center; display: inline-block; min-width: 90px; }
+    .prio-Optional { background: #f3f4f6; color: #4b5563; }
+    .prio-Low { background: #dcfce7; color: #16a34a; }
+    .prio-Medium { background: #f3e8ff; color: #7e22ce; }
+    .prio-High { background: #ffedd5; color: #c2410c; }
+    .prio-Critical { background: #fee2e2; color: #dc2626; }
 </style>
 
 <div class="content pt-4">
     <div class="container-fluid">
+        <h3 class="font-weight-bold mb-4" style="color: #111827;">Priorities</h3>
+
         <div class="blueprint-card">
-            <h4 class="font-weight-bold mb-4" style="color: #111827;">Priorities</h4>
+            <h4 class="font-weight-bold" style="color: #111827;">All Priorities</h4>
+            <p class="text-muted mb-4" style="font-size: 0.9rem;">Manage task urgency levels</p>
             
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                <form method="get" class="search-pill-wrapper">
+                    <input type="text" name="q" placeholder="Search priorities..." value="{{ request.GET.q }}">
+                    <button type="submit" style="background: none; border: none; color: #9ca3af;"><i class="la la-search"></i></button>
+                </form>
+                <a href="{% url 'priority-add' %}" class="btn-pill-primary">+ Add Priority</a>
+            </div>
+
             <div class="table-responsive">
-                <table class="table table-borderless">
+                <table class="table table-custom table-borderless">
                     <thead>
                         <tr>
-                            <th style="color: #111827;">Name</th>
-                            <th style="color: #0ea5e9;">Total Tasks</th>
-                            <th style="color: #f59e0b;">Pending</th>
-                            <th style="color: #3b82f6;">In Progress</th>
-                            <th style="color: #10b981;">Completed</th>
+                            <th width="10%">#</th>
+                            <th width="60%">LEVEL</th>
+                            <th width="30%">ACTION</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for priority in priorities %}
+                        {% for priority in object_list %}
                         <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td><span class="pill prio-{{ priority.name|slugify|title }}">{{ priority.name }}</span></td>
                             <td>
-                                <span class="prio-badge prio-{{ priority.name|slugify|default:'default' }}">
-                                    {{ priority.name }}
-                                </span>
+                                <a href="{% url 'priority-update' priority.id %}" class="action-pill edit">Edit</a>
+                                <a href="{% url 'priority-delete' priority.id %}" class="action-pill delete">Delete</a>
                             </td>
-                            <td class="font-weight-bold">{{ priority.total_tasks }}</td>
-                            <td>{{ priority.pending }}</td>
-                            <td>{{ priority.in_progress }}</td>
-                            <td>{{ priority.completed }}</td>
                         </tr>
                         {% empty %}
-                        <tr><td colspan="5" class="text-center py-4 text-muted">No priorities found.</td></tr>
+                        <tr><td colspan="3" class="text-center py-5 text-muted">No priorities found.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>

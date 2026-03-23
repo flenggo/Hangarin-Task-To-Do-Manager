@@ -9,78 +9,156 @@
     <link rel="stylesheet" href="{% static 'css/ready.css' %}"> 
     <link rel="stylesheet" href="{% static 'css/demo.css' %}">
     <style>
-        /* 1. Minimalist Light Theme Variables */
-        :root {
-            --bg-color: #f8f9fa; /* Very soft off-white background */
-            --text-main: #2b2b2b;
-            --text-muted: #6c757d;
-            --card-bg: #ffffff;
-            --border-color: #eaedf1;
-            --sidebar-active-bg: #eef2ff; /* Soft blue highlight */
-            --sidebar-active-text: #4f46e5; /* Deep indigo */
-        }
+    /* 1. Minimalist Light Theme Variables */
+    :root {
+        --bg-color: #f8f9fa; 
+        --text-main: #1a1a1a;    /* Slightly darker for better readability */
+        --text-muted: #64748b;   /* Modern Slate gray */
+        --card-bg: #ffffff;
+        --border-color: #e2e8f0;
+        --sidebar-active-bg: #eef2ff; 
+        --sidebar-active-text: #4f46e5; 
+    }
 
-        body {
-            background-color: var(--bg-color) !important;
-            color: var(--text-main) !important;
-            font-family: 'Inter', 'Segoe UI', sans-serif; 
-        }
+    body {
+        background-color: var(--bg-color) !important;
+        color: var(--text-main) !important;
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+        overflow-x: hidden; /* Prevent horizontal shift */
+    }
 
-        .wrapper, .main-panel, .content {
-            background-color: var(--bg-color) !important;
-        }
+    /* 2. Fix the Sidebar Scroll Wheel & Padding */
+    .sidebar {
+        background-color: var(--card-bg) !important;
+        border-right: 1px solid var(--border-color);
+        box-shadow: none !important;
+        height: 100vh !important;
+        position: fixed;
+        /* Hides clunky scrollbars while keeping scroll functionality */
+        scrollbar-width: none; 
+        -ms-overflow-style: none;
+    }
 
-        /* Clean Top Navbar */
-        .main-header .logo-header, .main-header .navbar-header {
-            background-color: var(--card-bg) !important;
-            border-bottom: 1px solid var(--border-color) !important;
-            box-shadow: none !important;
-        }
-        
-        .main-header .logo {
-            color: var(--text-main) !important;
-            font-size: 1.4rem;
-            letter-spacing: -0.5px;
-        }
+    .sidebar::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
+    }
 
-        .navbar-toggler-icon {
-            filter: invert(1); /* Makes the hamburger menu dark */
-        }
+    .sidebar .sidebar-wrapper {
+        overflow-y: auto;
+        height: calc(100% - 60px); /* Adjust based on header height */
+    }
 
-        /* Clean Sidebar */
-        .sidebar {
-            background-color: var(--card-bg) !important;
-            border-right: 1px solid var(--border-color);
-            box-shadow: none !important;
-        }
+    /* 3. Darken & Sharpen the Hamburger Menu */
+    .navbar-toggler .navbar-toggler-icon {
+        filter: brightness(0) saturate(100%) invert(8%) sepia(12%) saturate(1535%) hue-rotate(182deg) brightness(96%) contrast(92%) !important;
+        /* This hex-to-filter ensures it matches your #1a1a1a text exactly */
+    }
 
-        .sidebar .nav-section {
-            color: var(--text-muted);
-            font-size: 0.7rem;
-            margin: 25px 20px 10px 20px;
-        }
+    /* 4. Fix User Profile / Name disappearing on small screens */
+    .user-profile-nav {
+        display: flex !important;
+        align-items: center;
+    }
 
-        .sidebar .nav-item a {
-            color: var(--text-muted) !important;
-            font-weight: 500;
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin: 4px 15px;
+    /* Hide text on mobile, but NEVER hide the circle icon */
+    @media (max-width: 768px) {
+        .navbar-nav .nav-item .nav-link span {
+            display: none !important; /* Hides "Ralph Justine" */
         }
+        .user-box {
+            margin-right: 0 !important;
+        }
+        /* Ensure the avatar stays visible and centered */
+        .avatar-sm {
+            width: 32px !important;
+            height: 32px !important;
+            display: block !important;
+        }
+    }
 
-        .sidebar .nav-item a:hover {
-            background: #f3f4f6;
-            color: var(--text-main) !important;
-        }
+    /* 5. Clean Menu Styling */
+    .sidebar .nav-item a {
+        color: var(--text-muted) !important;
+        font-weight: 500;
+        padding: 10px 20px !important;
+        border-radius: 8px;
+        margin: 2px 15px !important;
+        transition: all 0.2s ease;
+    }
 
-        /* Modern Active Menu Item */
-        .sidebar .nav-item.active a {
-            background: var(--sidebar-active-bg) !important;
-            color: var(--sidebar-active-text) !important;
-            font-weight: 600;
-            box-shadow: none;
-        }
-    </style>
+    .sidebar .nav-item a:hover {
+        background: #f1f5f9 !important;
+        color: var(--text-main) !important;
+    }
+
+    .sidebar .nav-item.active a {
+        background: var(--sidebar-active-bg) !important;
+        color: var(--sidebar-active-text) !important;
+        font-weight: 600;
+    }
+
+    /* Section Headers */
+    .sidebar .nav-section .sidebar-mini-icon {
+        color: var(--text-muted);
+    }
+    .sidebar .nav-section .text-section {
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    /* 1. The Container (The white box) */
+    .dropdown-menu {
+        border: none !important;
+        border-radius: 12px !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+        padding: 10px !important;
+        min-width: 180px !important;
+        margin-top: 10px !important;
+    }
+
+    /* 2. User Info Section (The "ralph" text) */
+    .dropdown-user-details {
+        padding: 8px 12px;
+        border-bottom: 1px solid #f3f4f6;
+        margin-bottom: 8px;
+    }
+
+    .dropdown-user-details .username {
+        font-weight: 700;
+        color: #111827;
+        font-size: 0.95rem;
+        display: block;
+    }
+
+    /* 3. The Sign Out Button (Modern "Soft Red") */
+    .btn-logout {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 10px 12px;
+        color: #ef4444 !important; /* Soft modern red */
+        background-color: transparent;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .btn-logout:hover {
+        background-color: #fef2f2 !important; /* Very light red hover */
+        color: #dc2626 !important;
+    }
+
+    /* Optional: Add a logout icon */
+    .btn-logout i {
+        margin-right: 8px;
+        font-size: 1.1rem;
+    }
+</style>
 </head>
 <body>
     <div class="wrapper">
@@ -120,9 +198,9 @@
                                 </li>
                                 <div class="dropdown-divider"></div>
                                 {% if user.is_authenticated %}
-                                    <a href="{% url 'account_logout' %}" class="btn btn-danger">Sign Out</a>
-                                {% else %}
-                                    <a href="{% url 'account_login' %}" class="btn btn-primary">Sign In</a>
+                                    <a href="{% url 'account_logout' %}" class="btn-logout">
+                                        <i class="fas fa-sign-out-alt"></i> Sign Out
+                                    </a>
                                 {% endif %}
                             </ul>
                         </li>

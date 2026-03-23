@@ -1,0 +1,52 @@
+{% load socialaccount %} 
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Hangarin | Create Account</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        /* [Reusing identical CSS from Login above for consistency] */
+        body { display: flex; align-items: center; justify-content: center; min-height: 100vh; background-color: #f3f4f6; font-family: 'Inter', sans-serif; }
+        .auth-card { max-width: 420px; width: 100%; background: #ffffff; border-radius: 20px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); padding: 40px; text-align: center; }
+        .icon-circle { width: 50px; height: 50px; background-color: #dcfce7; color: #16a34a; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 24px; }
+        .form-control { border-radius: 10px; padding: 12px 15px; border: 1px solid #e5e7eb; background-color: #ffffff; margin-bottom: 12px; }
+        .btn-primary-full { background-color: #0d6efd; color: white; border: none; border-radius: 10px; padding: 12px; width: 100%; font-weight: 600; transition: 0.2s; }
+        .btn-primary-full:hover { background-color: #0b5ed7; }
+        .footer-link { font-size: 0.9rem; color: #6b7280; margin-top: 25px; }
+        .footer-link a { color: #0d6efd; text-decoration: none; font-weight: 600; }
+        .auth-card label { display: block; text-align: left; font-size: 0.85rem; font-weight: 600; color: #4b5563; margin-bottom: 5px; margin-left: 2px; }
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <h2 class="fw-bold mb-1" style="color: #111827;">Create Account</h2>
+        <p class="text-muted mb-4" style="font-size: 0.9rem;">Join Hangarin and start organizing</p>
+
+        <form method="post" action="{% url 'account_signup' %}">
+            {% csrf_token %}
+            
+            <label>Username</label>
+            <input type="text" name="username" class="form-control" placeholder="Choose a username" required>
+            
+            <label>Email</label>
+            <input type="email" name="email" class="form-control" placeholder="your@email.com" required>
+            
+            <label>Password</label>
+            <input type="password" name="password" class="form-control" placeholder="Create a password" required>
+            
+            <label>Confirm Password</label>
+            <input type="password" name="password_confirm" class="form-control" placeholder="Repeat your password" required>
+            
+            <button type="submit" class="btn-primary-full mt-3">Create Account</button>
+        </form>
+
+        <div class="footer-link">
+            Already have an account? <a href="{% url 'account_login' %}">Sign in</a>
+        </div>
+    </div>
+</body>
+</html>

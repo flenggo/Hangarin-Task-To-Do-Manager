@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<style>
+    .auth-card {
+        max-width: 400px;
+        margin: 60px auto;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        padding: 40px 30px;
+        text-align: center;
+    }
+</style>
+
+<div class="container">
+    <div class="auth-card">
+        <h3 class="font-weight-bold mb-4" style="color: #111827;">Sign Out</h3>
+        <p class="mb-4 text-muted" style="font-size: 0.95rem;">Are you sure you want to sign out of Hangarin?</p>
+        
+        <form method="post" action="{% url 'account_logout' %}">
+            {% csrf_token %}
+            {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+            {% endif %}
+            <button class="btn btn-danger w-100" type="submit" style="font-weight: 600; padding: 10px;">Yes, Sign Out</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -147,3 +147,7 @@ STATICFILES_DIRS = [
 
 # The NEW bucket where Django will collect them for PythonAnywhere
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+LOGIN_URL = 'account_login'
+
+ACCOUNT_LOGOUT_REDIRECT_URL = '/accounts/login/'

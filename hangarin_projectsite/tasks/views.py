@@ -13,8 +13,9 @@ from .forms import NoteFormSet, SubTaskFormSet, TaskForm
 from .models import Task, Category, Priority
 from django.db import transaction
 from django.db.models import Q, Count
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-class HomePageView(ListView):
+class HomePageView(LoginRequiredMixin, ListView):
     model = Task
     context_object_name = 'home'
     template_name = "home.html"
@@ -68,7 +69,7 @@ class HomePageView(ListView):
 
         return context
 
-class TaskListView(ListView):
+class TaskListView(LoginRequiredMixin, ListView):
     model = Task
     context_object_name = 'tasks'
     template_name = 'task_list.html'
@@ -113,7 +114,7 @@ class TaskListView(ListView):
             return sort_by
         return "-created_at"
 
-class TaskCreateView(CreateView):
+class TaskCreateView(LoginRequiredMixin, CreateView):
     model = Task
     form_class = TaskForm
     template_name = 'task_form.html'
@@ -142,7 +143,7 @@ class TaskCreateView(CreateView):
                 notes.save()
         return super().form_valid(form)
 
-class TaskUpdateView(UpdateView):
+class TaskUpdateView(LoginRequiredMixin, UpdateView):
     model = Task
     form_class = TaskForm
     template_name = 'task_form.html'
@@ -171,12 +172,12 @@ class TaskUpdateView(UpdateView):
                 notes.save()
         return super().form_valid(form)
 
-class TaskDeleteView(DeleteView):
+class TaskDeleteView(LoginRequiredMixin, DeleteView):
     model = Task
     template_name = 'task_del.html'
     success_url = reverse_lazy('task-list')
 
-class CategoryListView(ListView):
+class CategoryListView(LoginRequiredMixin, ListView):
     model = Category
     context_object_name = 'categories'
     template_name = 'category_list.html'
@@ -190,7 +191,7 @@ class CategoryListView(ListView):
             completed=Count('task', filter=Q(task__status='Completed'))
         ).order_by('-total_tasks') # Sorts by most tasks first
 
-class PriorityListView(ListView):
+class PriorityListView(LoginRequiredMixin, ListView):
     model = Priority
     context_object_name = 'priorities'
     template_name = 'priority_list.html'

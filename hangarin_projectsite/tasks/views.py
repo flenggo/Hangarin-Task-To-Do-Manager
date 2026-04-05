@@ -1,3 +1,6 @@
+import os
+import requests
+
 from django.db import models
 from django.shortcuts import render
 
@@ -67,6 +70,24 @@ class HomePageView(LoginRequiredMixin, ListView):
         if 'page' in query_params:
             del query_params['page'] # Remove the old page number
         context['query_params'] = query_params.urlencode() # Send the rest to the template
+
+        api_key = os.getenv("OPENWEATHER_API_KEY")
+        city = "Puerto Princesa"
+        url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
+
+        try:
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+
+            context["weather"] = {
+                "city": data["name"],
+                "temp": round(data["main"]["temp"]),
+                "description": data["weather"][0]["description"].title(),
+                "icon": data["weather"][0]["icon"],
+            }
+        except Exception as e:
+            context["weather"] = {"error": str(e)}
 
         return context
 
